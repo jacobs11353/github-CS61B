@@ -1,5 +1,7 @@
 /* RunIterator.java */
 
+package pj1;
+
 /**
  *  The RunIterator class iterates over a RunLengthEncoding and allows other
  *  classes to inspect the runs in a run-length encoding, one run at a time.
@@ -36,7 +38,8 @@ public class RunIterator implements Iterator {
    *  Define any variables associated with a RunIterator object here.
    *  These variables MUST be private.
    */
-
+  private DListNode current;
+  private DListNode head;
 
 
 
@@ -54,8 +57,10 @@ public class RunIterator implements Iterator {
   // constructor that you want so that your RunLengthEncoding.iterator()
   // implementation can construct a RunIterator that points to the first run of
   // the encoding.
-  RunIterator() {
+  RunIterator(DListNode node) {
     // Your solution here.  You may add parameters to the method signature.
+    this.current = node;
+    this.head = node.prev;
   }
 
   /**
@@ -66,7 +71,11 @@ public class RunIterator implements Iterator {
    */
   public boolean hasNext() {
     // Replace the following line with your solution.
-    return false;
+    if(current.next == null || current.next == head){
+      return false;
+    }else{
+      return true;
+    }
   }
 
   /**
@@ -94,9 +103,27 @@ public class RunIterator implements Iterator {
     // Construct a new array of 4 ints, fill in its values, and return it.
     // Don't forget to advance the RunIterator's pointer so that the next
     // call to next() will return the subsequent run.
-
+     
     // Replace the following line with your solution.
-    return new int[4];
+    if(current != null){
+      int[] run_element = new int[4];
+      Pixel current_item = (Pixel)(current.item);
+      run_element[0] = current_item.runLengths;//((Pixel)(current.item)).runLengths; 
+      run_element[1] = current_item.red;//((Pixel)(current.item)).red;
+      run_element[2] = current_item.green;
+      run_element[3] = current_item.blue;
+
+      //advance the iterator to next run
+      if(this.hasNext()){
+        current = current.next;
+      }else{
+        current = null;
+      }
+      return run_element;
+
+    }else{
+      throw new NoSuchElementException();
+    }
   }
 
   /**

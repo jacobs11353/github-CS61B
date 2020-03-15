@@ -1,5 +1,7 @@
 /* PixImage.java */
 
+package pj1;
+
 /**
  *  The PixImage class represents an image, which is a rectangular grid of
  *  color pixels.  Each pixel has red, green, and blue intensities in the range
@@ -15,14 +17,19 @@
  *  See the README file accompanying this project for additional details.
  */
 
+import java.util.Arrays;
+
 public class PixImage {
 
   /**
    *  Define any variables associated with a PixImage object here.  These
    *  variables MUST be private.
    */
-
-
+  private int width;
+  private int height;
+  private short[][] pix_red;
+  private short[][] pix_green;
+  private short[][] pix_blue;
 
 
   /**
@@ -33,6 +40,11 @@ public class PixImage {
    * @param height the height of the image.
    */
   public PixImage(int width, int height) {
+  	this.width = width;
+  	this.height = height;
+  	this.pix_red = new short[width][height];
+  	this.pix_green = new short[width][height];
+  	this.pix_blue = new short[width][height];
     // Your solution here.
   }
 
@@ -43,7 +55,7 @@ public class PixImage {
    */
   public int getWidth() {
     // Replace the following line with your solution.
-    return 1;
+    return this.width;
   }
 
   /**
@@ -53,7 +65,7 @@ public class PixImage {
    */
   public int getHeight() {
     // Replace the following line with your solution.
-    return 1;
+    return this.height;
   }
 
   /**
@@ -65,7 +77,7 @@ public class PixImage {
    */
   public short getRed(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return this.pix_red[x][y];
   }
 
   /**
@@ -77,7 +89,7 @@ public class PixImage {
    */
   public short getGreen(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return this.pix_green[x][y];
   }
 
   /**
@@ -89,7 +101,7 @@ public class PixImage {
    */
   public short getBlue(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return this.pix_blue[x][y];
   }
 
   /**
@@ -106,6 +118,9 @@ public class PixImage {
    * @param blue the new blue intensity for the pixel at coordinate (x, y).
    */
   public void setPixel(int x, int y, short red, short green, short blue) {
+  	this.pix_red[x][y] = red;
+  	this.pix_green[x][y] = green;
+  	this.pix_blue[x][y] = blue;
     // Your solution here.
   }
 
@@ -119,8 +134,21 @@ public class PixImage {
    * @return a String representation of this PixImage.
    */
   public String toString() {
+  	String result = " ";
+  	for(int i=0; i<this.getHeight(); i++){
+  		result = result + "{ ";
+  		for(int j=0; j<this.getWidth(); j++){
+  			result = result + " ("+ j+","+i+"): [";
+  			//result = result + "[ ";
+  			result = result + this.getRed(j,i) + ", ";
+  			result = result + this.getGreen(j,i) + ", ";
+  			result = result + this.getBlue(j,i);
+  		    result = result + " ], ";
+  		}
+  		result = result + " } \r\n";
+  	}
     // Replace the following line with your solution.
-    return "";
+    return result;
   }
 
   /**
@@ -154,7 +182,80 @@ public class PixImage {
    */
   public PixImage boxBlur(int numIterations) {
     // Replace the following line with your solution.
-    return this;
+    if(numIterations<1){
+    	return this;
+    }
+    //System.out.println("1.inside boxBlur, numIterations:"+numIterations);
+    if(this.width<2 || this.height<2){
+    	System.exit(0);
+    }
+    short average_blue;
+    short average;
+    PixImage currentImage = new PixImage(this.width, this.height);
+    // corner: average of four pixel 
+	    //right-bottom
+	    average_blue = (short)(this.getBlue(this.width-1, this.height-1)+ this.getBlue(this.width-2,this.height-1) + this.getBlue(this.width-1,this.height-2) + this.getBlue(this.width-2,this.height-2));
+	    average = (short)(average_blue/4);
+	    currentImage.setPixel(this.width -1, this.height -1, average, average, average);
+
+	    // right-top
+	    average_blue = (short)(this.getBlue(this.width-1, 0)+ this.getBlue(this.width-2,0) + this.getBlue(this.width-1,1) + this.getBlue(this.width-2,1));
+	     average = (short)(average_blue/4);
+	    currentImage.setPixel(this.width -1, 0, average, average, average);
+
+	    //left-bottom
+	    average_blue = (short)(this.getBlue(0, this.height-1)+ this.getBlue(0,this.height-2) + this.getBlue(1,this.height-1) + this.getBlue(1,this.height-2));
+	    average = (short)(average_blue/4);
+	    currentImage.setPixel(0, this.height -1, average, average, average);
+
+	    //left-top
+	    average_blue = (short)(this.getBlue(0, 0)+ this.getBlue(0,1) + this.getBlue(1,0) + this.getBlue(1,1));
+	    average = (short)(average_blue/4);
+	    currentImage.setPixel(0, 0, average, average, average);
+
+	 // edge: average of six pixel 
+	    //top
+	    for(int m=1; m<this.width-1;m++){
+	    	average_blue = (short)(this.getBlue(m,0)+this.getBlue(m-1,0)+this.getBlue(m+1,0)
+	    					+this.getBlue(m,1)+this.getBlue(m-1,1)+this.getBlue(m+1,1));
+	    	average = (short)(average_blue/6);
+	    	currentImage.setPixel(m, 0, average, average, average);
+	    }
+	    //bottom
+	    for(int m=1; m<this.width-1;m++){
+	    	average_blue = (short)(this.getBlue(m,this.height-1)+this.getBlue(m-1,this.height-1)+this.getBlue(m+1,this.height-1)
+	    					+this.getBlue(m,this.height-2)+this.getBlue(m-1,this.height-2)+this.getBlue(m+1,this.height-2));
+			average = (short)(average_blue/6);
+	    	currentImage.setPixel(m, this.height-1, average, average, average);
+	    }
+	    //left
+	    for(int n=1; n<this.height-1;n++){
+	    	average_blue = (short)(this.getBlue(0,n)+this.getBlue(0,n-1)+this.getBlue(0,n+1)
+	    	               +this.getBlue(1,n)+this.getBlue(1,n-1)+this.getBlue(1,n+1));
+	    	average = (short)(average_blue/6);           
+	    	currentImage.setPixel(0, n, average, average, average);
+	    }
+	    //right
+	    for(int n=1; n<this.height-1;n++){
+	    	average_blue = (short)(this.getBlue(this.width-1,n)+this.getBlue(this.width-1,n-1)+this.getBlue(this.width-1,n+1)
+	    				   +this.getBlue(this.width-2,n)+this.getBlue(this.width-2,n-1)+this.getBlue(this.width-2,n+1));
+	        average = (short)(average_blue/6);            
+	    	currentImage.setPixel(this.width-1, n, average, average, average);			   
+	    }
+	// innner: average of nine pixel
+	    for(int j=1; j<height-1; j++){
+	    	for(int i=1; i<width-1; i++){
+	    		average_blue = (short)(this.getBlue(i,j)+this.getBlue(i-1,j)+this.getBlue(i+1,j)
+	    		               +this.getBlue(i,j-1)+this.getBlue(i-1,j-1)+this.getBlue(i+1,j-1)
+	    		               +this.getBlue(i,j+1)+this.getBlue(i-1,j+1)+this.getBlue(i+1,j+1));
+	    	average = (short)(average_blue/9);
+	    	currentImage.setPixel(i, j, average, average, average);
+	    	}
+	    }
+    //System.out.println("2.currentImage:"+ currentImage);
+    numIterations = numIterations - 1;
+    //System.out.println("3.numIterations is :" + numIterations);
+    return currentImage.boxBlur(numIterations);
   }
 
   /**
@@ -199,11 +300,104 @@ public class PixImage {
    */
   public PixImage sobelEdges() {
     // Replace the following line with your solution.
-    return this;
+  int  gx_red;
+  int  gx_green;
+	int  gx_blue;
+	int  gy_red;
+	int  gy_green;
+	int  gy_blue;
+	long energy;
+
+  short[][] gx_op= new short[][]{{1,0,-1},{2,0,-2},{1,0,-1}};
+  short[][] gy_op= new short[][]{{1,2,1},{0,0,0},{-1,-2,-1}};
+
+  short[][] pixFrame = new short[3][3];
+
+	PixImage currentImage = new PixImage(this.width, this.height);
+
+    for(int i=0; i<this.width; i++){
+      for(int j=0; j<this.height; j++){
+        //red
+        frame_matrix(pixFrame,i,j,0);
+        //System.out.println("pix Frame in location ("+i+", "+j+") is : "+Arrays.deepToString(pixFrame));
+        gx_red = matrixMulti(gx_op, pixFrame);
+        gy_red = matrixMulti(gy_op, pixFrame);
+
+        //green
+        frame_matrix(pixFrame,i,j,2);
+        gx_green = matrixMulti(gx_op, pixFrame);
+        gy_green = matrixMulti(gy_op, pixFrame);
+
+        //blue
+        frame_matrix(pixFrame,i,j,3);
+        gx_blue = matrixMulti(gx_op, pixFrame);
+        gy_blue = matrixMulti(gy_op, pixFrame);
+
+        // sum the square of the 3 gradients at each pixels
+  
+        //red
+        energy = (long)(Math.pow(gx_red,2)+Math.pow(gy_red,2)+
+                        Math.pow(gx_green,2)+Math.pow(gy_green,2)+
+                        Math.pow(gx_blue,2)+Math.pow(gy_blue,2));
+        currentImage.setPixel(i,j,mag2gray(energy),mag2gray(energy),mag2gray(energy));
+
+      }
+    }
+
+    return currentImage;
     // Don't forget to use the method mag2gray() above to convert energies to
     // pixel intensities.
   }
 
+  public void frame_matrix(short[][] pixFrame, int x, int y, int color){
+
+      int x_index = 0;
+      int y_index = 0;
+
+      for(int i=0; i<3; i++ ){
+        for(int j=0; j<3; j++){
+          // x level
+          if ((x-1+i)<0){
+            x_index = 0;
+          }else if((x-1+i)>this.width-1){
+            x_index = this.width-1;
+          }else{
+            x_index = x-1+i;
+          }
+
+          //y level
+          if((y-1+j)<0){
+            y_index = 0;
+          }else if((y-1+j)>this.height-1){
+            y_index = this.height-1;
+          }else{
+            y_index = y-1+j;
+          }
+
+          //color level
+          if(color == 0){
+            pixFrame[i][j] = this.getRed(x_index,y_index);
+          }else if(color ==1){
+            pixFrame[i][j] = this.getGreen(x_index,y_index);
+          }else{
+            pixFrame[i][j] = this.getBlue(x_index,y_index);
+          }
+
+        }
+
+      }
+      return;
+  }
+
+  public short matrixMulti(short[][] operator, short[][] pixFrame){
+    short sum =0;
+    for(int i=0; i<3; i++){
+      for(int j=0; j<3; j++){
+        sum += operator[i][j]* pixFrame[i][j];
+      }
+    }
+    return sum;
+  }
 
   /**
    * TEST CODE:  YOU DO NOT NEED TO FILL IN ANY METHODS BELOW THIS POINT.
@@ -238,6 +432,8 @@ public class PixImage {
   private static PixImage array2PixImage(int[][] pixels) {
     int width = pixels.length;
     int height = pixels[0].length;
+   // System.out.println("width:" + width);
+   // System.out.println("height:" + height);
     PixImage image = new PixImage(width, height);
 
     for (int x = 0; x < width; x++) {
@@ -289,13 +485,28 @@ public class PixImage {
     PixImage image1 = array2PixImage(new int[][] { { 0, 10, 240 },
                                                    { 30, 120, 250 },
                                                    { 80, 250, 255 } });
+        //PixImage image1 = array2PixImage(new int[][] { {1, 0, -1}, {2, 0, -2}, {1, 0, -1} });
+        //System.out.println("image1.(0,0): "+image1.getRed(0,0)+" "+image1.getGreen(0,0)+" "+image1.getBlue(0,0));
+
+       // System.out.println("image1.(0,1): "+image1.getRed(0,1)+" "+image1.getGreen(0,1)+" "+image1.getBlue(0,1));
+
+       // System.out.println("image1.(0,2): "+image1.getRed(0,2)+" "+image1.getGreen(0,2)+" "+image1.getBlue(0,2));
+
+       // System.out.println("***************************************************");
+      //          System.out.println("image1.(1,0): "+image1.getRed(1,0)+" "+image1.getGreen(1,0)+" "+image1.getBlue(1,0));
+
+        //System.out.println("image1.(1,1): "+image1.getRed(1,1)+" "+image1.getGreen(1,1)+" "+image1.getBlue(1,1));
+
+       // System.out.println("image1.(1,2): "+image1.getRed(1,2)+" "+image1.getGreen(1,2)+" "+image1.getBlue(1,2));
+        //        System.out.println("***************************************************");
     System.out.println("Testing getWidth/getHeight on a 3x3 image.  " +
                        "Input image:");
-    System.out.print(image1);
+    System.out.println(image1);
     doTest(image1.getWidth() == 3 && image1.getHeight() == 3,
            "Incorrect image width and height.");
 
     System.out.println("Testing blurring on a 3x3 image.");
+    System.out.println(image1.boxBlur(1));
     doTest(image1.boxBlur(1).equals(
            array2PixImage(new int[][] { { 40, 108, 155 },
                                         { 81, 137, 187 },
@@ -339,3 +550,82 @@ public class PixImage {
            "Incorrect Sobel:\n" + image2.sobelEdges());
   }
 }
+
+
+
+  // // corner: average of four pixel 
+  //     //right-bottom
+  //   gx_red = 3*(this.getRed(this.width-2,this.height-1)-this.getRed(this.width-1,this.height-1))+this.getRed(this.width-2,this.height-2)-this.getRed(this.width-1,this.height-2);
+  //   gy_red = 3*(this.getRed(this.width-1,this.height-2)-this.getRed(this.width-1,1))+this.getRed(this.width-2,0)-this.getRed(this.width-2,1);
+      
+  //     energy = (long)(Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2));
+  //     currentImage.setPixel(this.width -1, this.height -1, mag2gray(energy), mag2gray(energy), mag2gray(energy));
+
+  //     // right-top
+  //   gx_red = 3*(this.getRed(this.width-2,0)-this.getRed(this.width-1,0))+this.getRed(this.width-2,1)-this.getRed(this.width-1,1);
+  //   gy_red = 3*(this.getRed(this.width-1,0)-this.getRed(this.width-1,1))+this.getRed(this.width-2,0)-this.getRed(this.width-2,1);
+      
+  //     energy = (long)(Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2));
+  //     currentImage.setPixel(this.width -1, this.height -1, mag2gray(energy), mag2gray(energy), mag2gray(energy));
+
+  //     //left-bottom
+  //     gx_red = this.getRed(0,this.height-2)-this.getRed(1,this.height-2)+ 3*(this.getRed(0,this.height-1)-this.getRed(1,height-1));
+  //     gy_red = this.getRed(1,this.height-2)-this.getRed(1,height-1)+3*(this.getRed(0,height-2)-this.getRed(0,height-1));
+
+  //     energy = (long)(Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2));
+  //     currentImage.setPixel(this.width -1, this.height -1, mag2gray(energy), mag2gray(energy), mag2gray(energy));
+      
+  //     //left-top
+  //     gx_red = 3*(this.getRed(0,0)-this.getRed(1,0))+this.getRed(0,1)-this.getRed(1,1);
+  //     gy_red = 3*(this.getRed(0,0)-this.getRed(0,1))+this.getRed(1,0)-this.getRed(1,1);
+
+  //     energy = (long)(Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2));
+  //     currentImage.setPixel(this.width -1, this.height -1, mag2gray(energy), mag2gray(energy), mag2gray(energy));
+
+  //  // edge: average of six pixel 
+  //     //top
+  //     for(int m=1; m<this.width-1;m++){
+  //       gx_red = 3*(this.getRed(m-1,0)-this.getRed(m+1,0))+this.getRed(m-1,1)-this.getRed(m+1,1);
+  //       gy_red = this.getRed(m-1,0)+2*(this.getRed(m,0))+this.getRed(m+1,0)-this.getRed(m-1,1)-2*(this.getRed(m,1))-this.getRed(m+1,1); 
+        
+  //       energy = (long)(Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2));
+  //       currentImage.setPixel(m, 0, mag2gray(energy), mag2gray(energy), mag2gray(energy));
+  //     }
+  //     //bottom
+  //     for(int m=1; m<this.width-1;m++){
+  //       gx_red = 3*(this.getRed(m-1,height-1)-this.getRed(m+1,height-1))+this.getRed(m-1,height-2)-this.getRed(m+1,height-2);
+  //       gy_red = this.getRed(m-1,height-2)+2*(this.getRed(m,height-2))+this.getRed(m+1,height-2)
+  //                -this.getRed(m-1,height-1)-2*(this.getRed(m,height-1))-this.getRed(m+1,height-1); 
+      
+  //     energy = (long)(Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2));
+  //       currentImage.setPixel(m, this.height-1, mag2gray(energy), mag2gray(energy), mag2gray(energy));
+  //     }
+  //     //left
+  //     for(int n=1; n<this.height-1;n++){
+  //       gx_red = this.getRed(width-2,n-1)+2*(this.getRed(width-2,n))+this.getRed(width-2,n+1)
+  //               -this.getRed(width-1,n-1)-2*(this.getRed(width-1,n))-this.getRed(width-1,n+1);
+  //       gy_red = 3*(this.getRed(width-2,n-1)-this.getRed(width-2,n+1))+this.getRed(width-1,n-1)-this.getRed(width-1,n+1);
+        
+  //       energy = (long)(Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2));
+  //       currentImage.setPixel(0, n, mag2gray(energy), mag2gray(energy), mag2gray(energy));
+  //     }
+  //     //right
+  //     for(int n=1; n<this.height-1;n++){
+  //       gx_red = this.getRed(0,n-1)+2*(this.getRed(0,n))+this.getRed(0,n+1)-this.getRed(1,n-1)-2*(this.getRed(1,n))-this.getRed(1,n+1);
+  //       gy_red = 3*(this.getRed(0,n-1)-this.getRed(0,n+1))+this.getRed(1,n-1)-this.getRed(1,n+1); 
+        
+  //       energy = (long)(Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2));          
+  //       currentImage.setPixel(this.width-1, n, mag2gray(energy), mag2gray(energy), mag2gray(energy));        
+  //     }
+  // // innner: average of nine pixel
+  //     for(int j=1; j<height-1; j++){
+  //       for(int i=1; i<width-1; i++){
+  //         gx_red = this.getRed(i-1,j-1)+2*(this.getRed(i-1,j))+this.getRed(i-1,j+1)
+  //                   -this.getRed(i+1,j-1)+2*(this.getRed(i+1,j))+this.getRed(i+1,j+1);
+
+  //         gy_red = this.getRed(i-1,j-1)+2*(this.getRed(i,j-1))+this.getRed(i+1,j-1)-this.getRed(i-1,j+1)-2*(this.getRed(i,j+1))-this.getRed(i+1,j+1);
+
+  //         energy = (long)(Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2)+(int)Math.pow(gx_red,2)+(int)Math.pow(gy_red,2));
+  //       currentImage.setPixel(i, j, mag2gray(energy), mag2gray(energy), mag2gray(energy));
+  //       }
+  //     }
