@@ -1,0 +1,21 @@
+GRADER file for Homework 8
+
+ Your Name:  
+Your Login:  
+
+Part III.  Running time comparisons
+
+  List size         mergesort             quicksort
+      100              1ms                  1ms
+    1,000              3ms                  1ms
+   10,000              11ms                 10ms
+  100,000              89ms                 77ms
+1,000,000            1851ms                1852ms
+
+Part IV.
+
+  Is mergesort stable?  Yes
+  Why or why not?       It will always iterate over every element in the list for log(n) time;
+
+  Is quicksort stable?  No
+  Why or why not?		When the list size is small, the choose of pivot can determine the performance of quicksort 	                      algorithm. If the pivot can divide the list into three equal-size sublist, the number of iterate 	                      over evey element will reduce from n(worst case) to log3(n);
